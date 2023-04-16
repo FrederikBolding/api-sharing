@@ -10,12 +10,18 @@ import { Box, Button } from "@chakra-ui/react";
 export const CodeEditor = () => {
   const [code, setCode] = useState(`function add(a, b) {\n  return a + b;\n}`);
   const [executionResult, setExecutionResult] = useState(null);
+  const [cid, setCid] = useState(null);
 
   const handleRun = async () => {
-    const result = await fetch("/api/evaluate", { method: 'POST', body: code});
-    console.log(result);
+    const result = await fetch("/api/evaluate", { method: "POST", body: code });
     const json = await result.json();
-    setExecutionResult(json)
+    setExecutionResult(json);
+  };
+
+  const handlePublish = async () => {
+    const result = await fetch("/api/publish", { method: "POST", body: code });
+    const json = await result.json();
+    setCid(json.cid);
   };
 
   return (
@@ -43,12 +49,14 @@ export const CodeEditor = () => {
           }}
         />
       </Box>
-      <Button onClick={handleRun} mr={1}>Run</Button>
-      <Button>Publish</Button>
+      <Button onClick={handleRun} mr={1}>
+        Run
+      </Button>
+      <Button onClick={handlePublish}>Publish</Button>
 
-      <Box>
-        {executionResult && JSON.stringify(executionResult, null, 2)}
-      </Box>
+      <Box>{executionResult && JSON.stringify(executionResult, null, 2)}</Box>
+
+      <Box>{cid && `Your API is available at localhost:3000/api/run/${cid}`}</Box>
     </>
   );
 };
